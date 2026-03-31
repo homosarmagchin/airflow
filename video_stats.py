@@ -65,3 +65,4 @@ if __name__ == "__main__":
     playlistId = get_playlist_id()
     video_ids = get_video_ids(playlistId)
     print(video_ids)
+    print("done")
