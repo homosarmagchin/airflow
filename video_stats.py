@@ -1,13 +1,11 @@
 import requests
-import json
-import os
+import os 
+from dotenv import load_dotenv
 
-# API_KEY = os.getenv('API_KEY')
-# CHANNEL_HANDLE = os.getenv('CHANNEL_HANDLE')
+load_dotenv(dotenv_path='.env')
 
-API_KEY = 'AIzaSyB9j1fn4QvdidfRlHpyg8i0O7Fq9RApXxs'
-CHANNEL_HANDLE = 'MrBeast'
-
+API_KEY = os.getenv('API_KEY')
+CHANNEL_HANDLE = os.getenv('CHANNEL_HANDLE')
 
 def get_playlist_id():
     try:
@@ -19,7 +17,7 @@ def get_playlist_id():
         data = response.json()
         channel_items = data['items'][0]
         channel_playlistId = channel_items['contentDetails']['relatedPlaylists']['uploads']
-        
+
         print(f"Channel Playlist ID: {channel_playlistId}")
 
         return channel_playlistId
