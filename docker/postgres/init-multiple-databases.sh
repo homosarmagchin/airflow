@@ -1,0 +1,32 @@
+#!/bin/bash
+set -euo pipefail
+
+create_user_and_database() {
+    local database="$1"
+    local username="$2"
+    local password="$3"
+
+    echo "Creating user '$username' and database '$database'"
+
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname postgres <<-EOSQL
+        DO
+        \$\$
+        BEGIN
+            IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '$username') THEN
+                CREATE ROLE "$username" LOGIN PASSWORD '$password';
+            END IF;
+        END
+        \$\$;
+
+        SELECT 'CREATE DATABASE "$database" OWNER "$username"'
+        WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$database')\gexec
+EOSQL
+
+    echo "User '$username' and database '$database' ready"
+}
+
+create_user_and_database "$METADATA_DATABASE_NAME" "$METADATA_DATABASE_USERNAME" "$METADATA_DATABASE_PASSWORD"
+create_user_and_database "$CELERY_BACKEND_NAME" "$CELERY_BACKEND_USERNAME" "$CELERY_BACKEND_PASSWORD"
+create_user_and_database "$ELT_DATABASE_NAME" "$ELT_DATABASE_USERNAME" "$ELT_DATABASE_PASSWORD"
+
+echo "All databases and users ready"
